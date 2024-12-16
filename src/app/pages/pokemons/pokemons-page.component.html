@@ -1,0 +1,22 @@
+<h1 class="text-3xl">Listado de Pokemons</h1>
+<h2 class="text-xl">Página actual: {{ currentPage() }}</h2>
+
+<hr class="my-2">
+
+@if ( pokemons().length > 0 ) {
+    <pokemon-list [pokemons]="pokemons()" />
+} @else {
+    <pokemon-list-skeleton />
+}
+
+<!-- botones anterior y siguiente -->
+
+<div class="flex" [ngClass]="{
+    'justify-between': currentPage()! > 1,
+    'justify-end': currentPage()! === 1
+    }">
+    @if(currentPage()! > 1) {
+        <button (click)="loadPokemons(-1)" class="mt-2">Anteriores</button>
+    }
+    <button (click)="loadPokemons(+1)" class="mt-2">Siguientes</button>
+</div>
