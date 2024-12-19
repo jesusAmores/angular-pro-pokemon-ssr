@@ -33,7 +33,7 @@ export default class PokemonPageComponent implements OnInit {
         const pageDescription = `Página del Pokemon ${name}`;
         this.title.setTitle(pageTitle);
         this.meta.updateTag({ name: 'description', content: pageDescription });
-        //open guard: para RRSS
+        //open graph: protocolo para mejor visualización de links en RRSS, usado en meta tags
         this.meta.updateTag({ name: 'og:title', content: pageTitle });
         this.meta.updateTag({ name: 'og:description', content: pageDescription });
         this.meta.updateTag({ name: 'og:image', content: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` });

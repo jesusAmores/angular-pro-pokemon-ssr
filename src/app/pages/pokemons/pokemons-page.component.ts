@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Title } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map, tap } from 'rxjs';
 import { PokemonListComponent } from '../../pokemons/components/pokemon-list/pokemon-list.component';
 import { SimplePokemon } from '../../pokemons/interfaces';
@@ -12,10 +12,15 @@ import { PokemonListSkeletonComponent } from './ui/pokemon-list-skeleton/pokemon
 @Component({
   selector: 'pokemons-page',
   standalone: true,
-  imports: [PokemonListComponent, PokemonListSkeletonComponent, CommonModule],
+  imports: [
+    PokemonListComponent, 
+    PokemonListSkeletonComponent,
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './pokemons-page.component.html'
 })
-export default class PokemonsPageComponent implements OnInit /* , OnDestroy */ {
+export default class PokemonsPageComponent /*implements OnInit , OnDestroy */ { 
 
   private pokemonsService = inject(PokemonsService);
   private destroyRef = inject(DestroyRef);
@@ -26,8 +31,8 @@ export default class PokemonsPageComponent implements OnInit /* , OnDestroy */ {
   public pokemons = signal<SimplePokemon[]>([]);
 
   public currentPage = toSignal<number>(
-    this.route.queryParamMap.pipe(
-      map(params => params.get('page') ?? '1'),
+    this.route.params.pipe(
+      map(params => params['page'] ?? '1'),
       map(page => ( isNaN(Number(page)) ? 1 : Number(page) )),
       map((page) => Math.max(1, page))
     ));
@@ -48,27 +53,33 @@ export default class PokemonsPageComponent implements OnInit /* , OnDestroy */ {
    * Con ApplicationRef podemos saber el estado de la app, si está estable
    * o si está renderizando componentes del server side
    */
-  ngOnInit() {
+  /* ngOnInit() {
     this.loadPokemons();
-    /* setTimeout(() => {
+    setTimeout(() => {
       this.isLoading.set(false);
-    }, 5000); */
-  }
+    }, 5000);
+  } */
 
   /* ngOnDestroy() {
     this._$appState.unsubscribe();
   } */
 
+  public loadOnPageChanged = effect(() => {
+    this.loadPokemons(this.currentPage());
+  }, {
+    allowSignalWrites: true,
+  })
+
   public loadPokemons(page = 0) {
-    const pageToLoad = this.currentPage()! + page;
+    const pageToLoad = page;
 
     this.pokemonsService.loadPage(pageToLoad).pipe(
       //Nota: no se efectúa una navegación, solo se cambia
       //los queryParams para efectuar la paginación, por ello
       //no se especifica en el array ['pokemons']
-      tap(() => this.router.navigate([], { 
+      /* tap(() => this.router.navigate([], { 
         queryParams: { page: pageToLoad } 
-      })),
+      })), */
       tap(() => this.title.setTitle(
         `Pokemon SSR - Page ${pageToLoad}`
       )),
