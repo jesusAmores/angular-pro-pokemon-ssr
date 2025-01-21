@@ -11,14 +11,16 @@
 
 <!-- botones anterior y siguiente -->
 
-<div class="flex" [ngClass]="{
-    'justify-between': currentPage()! > 1,
-    'justify-end': currentPage()! === 1
-    }">
-    @if(currentPage()! > 1) {
-        <!-- <button (click)="loadPokemons(-1)" class="mt-2">Anteriores</button> -->
-        <button [routerLink]="['/pokemons/page/', currentPage()! - 1]" class="mt-2">Anteriores</button>
-    }
-    <!-- <button (click)="loadPokemons(+1)" class="mt-2">Siguientes</button> -->
-     <button [routerLink]="['/pokemons/page/', currentPage()! + 1]" class="mt-2">Siguientes</button>
+<div class="flex justify-between">
+    <button 
+        [routerLink]="['/pokemons/page/', currentPage()! - 1]" 
+        class="mt-2" 
+        [disabled]="currentPage()! === 1">
+        Anteriores
+    </button>
+    <button 
+        [routerLink]="['/pokemons/page/', currentPage()! + 1]" 
+        class="mt-2">
+        Siguientes
+    </button>
 </div>
